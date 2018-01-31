@@ -3,11 +3,42 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <title>JS Bin</title>
+  <title>Assingment 3</title>
 </head>
+  <style> 
+    H2 {
+      color:Red;
+      padding: 0;
+      margin:0;
+    }
+    H4{
+      color: Grey;
+      padding:0;
+      margin:0;
+      }
+  </style> 
 <body>
-This is a new page in JSBin that will be copied to GitHub pages. Take 2.<br><br>
   
-  <img src="https://bmarmur.github.io/LA558/Images/Picture3.png" alt="SciNatura" style="width:304px;height:228px:">
+  <h2> Assignment 2 </h2>
+  <h4> Bree Marmur </h4>
+  
+  <br>
+  
+  <a href="#" onclick="changeMap('basemapLandcover')">Basemap</a>&nbsp;&nbsp;&nbsp;
+  <a href="#" onclick="changeMap('bedBreakfast')"> Bed and Breakfasts</a>&nbsp;&nbsp;&nbsp;
+  <a href="#"onclick="changeMap('museums')">Museums</a>&nbsp;&nbsp;&nbsp;  
+  <a href="#"onclick="changeMap('orchards_border')">Orchards</a>&nbsp;&nbsp;&nbsp; 
+  <a href="#"onclick="changeMap('vineyards')">Vineyards</a>&nbsp;&nbsp;&nbsp;
+  
+  <br>
+  
+  <img id="myMap" src="https://bmarmur.github.io/LA558/Assignment 2/Images/basemapLandcover.png" alt="Iowa Landcover Map" width="600" 
+  
 </body>
+                                                                                                                                      
+<script>
+    function changeMap(x) {
+    document.getElementById("myMap").src = "https://bmarmur.github.io/LA558/Assignment 2/Images/"+ x + ".png";
+        }
+</script>
 </html>
