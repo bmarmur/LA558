@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<!--
+Created using JS Bin
+http://jsbin.com
+
+Copyright (c) 2018 by bmarmur (http://jsbin.com/dewaser/10/edit)
+
+Released under the MIT license: http://jsbin.mit-license.org
+-->
+<meta name="robots" content="noindex">
+<html>
+<head>
+  
+<meta name="description" content="Assignment4">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Assignment 4</title>
+<style id="jsbin-css">
+body {
+  background-color:lightgrey;
+}
+#container {
+  background: black;
+  width: 800px;
+  padding: 10px;
+  text-align: center;
+  margin-left:auto;
+    margin-right:auto;
+}
+#header {
+  background: white
+    ;
+  margin-left: 50px; 
+  margin-right: 50px;
+  text-align: center;
+}
+
+#content {
+  width:780px;
+  padding: 10px;
+  background-color:white;
+    }
+
+#myFavBooks {
+  width: 750px;
+  background-color:#4080ed;
+  padding: 15px;
+    }
+
+#aboutBooks {
+  width:370px;
+  height:150px;
+  background-color:#d8e6ff;
+  padding: 10px;
+  float:left
+  }
+
+
+#haveYouRead {
+  width: 370px;
+  height: 150px;
+  background-color:#94bbfc;
+  
+  padding: 10px;
+  float: right;
+}
+
+#yourFav {
+  width: 370px;
+  height: 120px;
+   background-color:#94bbfc;
+  padding: 10px;
+  clear:both;
+  Float:left;
+    
+}
+
+#toRead {
+  width: 370px;
+  height: 120px;
+   background-color:#d8e6ff;
+  padding: 10px;
+  float:right;
+   
+}
+
+#misc {
+  width:750px;
+   background-color:#4080ed; ;
+  padding: 15px;
+  clear:both
+}
+</style>
+</head>
+  
+<body>
+  <div id="container">
+       
+  <div id="header">     
+      <h1>Assignment 4</h1>
+      <h2> Bree Marmur</h2>
+  </div>
+    
+  <div id="content">
+  
+  <div id=myFavBooks>
+      <h2>My Favorite Books</h2>
+          <p id="favBooks"></p>
+  </div>
+    
+  <div id="aboutBooks">
+    
+    <h4>About my #1 favorite book</h4>
+          <p id="Dreaming Book"></p>
+           <br>
+          <!--<p id="East Book"></p>-->
+  </div>
+  
+  <div id="haveYouRead">
+  <h4>  Have you read any of these books?</h4>
+      <form>
+        <input type="checkbox" name="Book1" value="City">I have read City of Dreaming Books<br>
+     <input type="checkbox" name="Book2" value="East">I have read East of Eden<br>
+     <input type="checkbox" name="Book3" value="Eyre">I have read Jane Eyre<br>
+     <input type="checkbox" name="Book4" value="Hyperion">I have read Hyperion Cantos<br>
+      </form>
+  </div>
+  
+  <div id="yourFav">
+   
+   
+    <h4>What is your favorite book?</h4>
+      <input type="text" id="favBook"
+       onchange="changeFunction(this.value)"><br>
+  </div>
+  
+  <div id=toRead>  
+    
+    
+    <h4>Here's a book I want to read!</h4>
+       
+        <button type="button" onclick="displayFunction()">Display</button>
+    
+        <p id="display"></p>
+  </div>
+  
+  <div id="misc">
+    <h4> Random examples</h4>
+    <hr>
+        <p id="demo"></p>
+       <hr>
+      <button onclick="myFunction2()">Click Me!</button>
+      <p id="displayTime"></p>
+ </div>
+  </div>
+  </div>
+  
+  
+<script id="jsbin-javascript">
+ var books = ["City of Dreaming Books", "East of Eden", "Jane Eyre", "Hyperion Cantos"];
+var text = "";
+var i;
+for (i = 0; i < books.length; i++) {
+    text += books[i] + "<br>";
+}
+document.getElementById("favBooks").innerHTML = text;
+
+
+function myFunction(p1, p2){
+  return p1 *p2;
+}
+document.getElementById("demo").innerHTML = myFunction(2,4);
+
+
+
+
+
+var dreamingBook = {Title:"City of Dreaming Books", Author:"Walter Moers", Genre:"Fantasy/Fiction"};
+
+document.getElementById("Dreaming Book").innerHTML=dreamingBook.Title + " is a " +dreamingBook.Genre + " book written by " + dreamingBook.Author +".";
+
+
+
+var eastBook = {Title:"East of Eden", Author:"John Steinbeck", Genre:"Classic American Novel"};
+
+document.getElementById("East Book").innerHTML=eastBook.Title + " is a " +eastBook.Genre + " book written by " + eastBook.Author +".";
+
+
+
+function myFunction2(){
+ var greeting;
+    var time = new Date().getHours();
+    if (time < 10) {
+        greeting = "Good morning!";
+    } else if (time < 20) {
+        greeting = "Good day!";
+    } else {
+        greeting = "Good evening!";
+    }
+document.getElementById("displayTime").innerHTML = greeting;
+}
+
+function displayFunction (){
+favBook= document.getElementById("favBook").value;
+document.getElementById("display").innerHTML=favBook;
+}
+
+
+</script>
+</body>
+  
+</html>
