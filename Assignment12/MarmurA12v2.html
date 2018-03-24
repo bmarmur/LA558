@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<!--
+Created using JS Bin
+http://jsbin.com
+
+Copyright (c) 2018 by bmarmur (http://jsbin.com/yaseyov/12/edit)
+
+Released under the MIT license: http://jsbin.mit-license.org
+-->
+<meta name="robots" content="noindex">
+<html>
+<script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/CC138D45-6C3B-474D-AE09-BA5EEBECB560/main.js" charset="UTF-8"></script><link rel="stylesheet" crossorigin="anonymous" href="https://gc.kis.v2.scr.kaspersky-labs.com/065BCEBEE5AB-90EA-D474-B3C6-54D831CC/abn/main.css"/><script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+
+  <head>
+<meta name="description" content="MarmurA12v2">
+      
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"></script>
+  <style id="jsbin-css">
+body {
+  background-color: thistle;
+  }
+
+#container {
+  background: WhiteSmoke;
+  width: 800px;
+  padding: 5px;
+  text-align: center;
+  margin-left:auto;
+    margin-right:auto;
+}
+
+#header {
+  background: SteelBlue;
+  margin-left: 10px; 
+  margin-right: 10px;
+  text-align: center;
+  color: white;
+}
+
+#controls {
+  background: WhiteSmoke;
+  margin-left: 30px; 
+  margin-right: 30px;
+  text-align: center;
+}
+
+#mapHere {
+  padding: 10px;
+  background-color:WhiteSmoke;
+  text-align:center;
+    }
+
+#map { 
+	height: 500px; 
+  width:500px;
+	margin-left: auto;
+    margin-right: auto;
+}
+
+</style>
+</head>
+  
+  <body>
+    
+    <div id="container">
+      
+     <div id="header">
+       <h2> World Tour </h2>
+       <p> Marmur Assignment 12 </p>
+      </div>
+      
+      <div id="controls">
+        
+        <button id="northAmerica"> Zoom to North America</button>
+      
+        <button id="southAmerica">Zoom to South America</button>
+      
+        <button id="africa">Zoom to Africa</button>
+        
+        <button id="asia">Zoom to Asia</button>
+        
+        <button id="world">Zoom to World</button><br>
+                    
+      </div>
+      
+      <div id=mapHere>
+        
+        
+         <div id="map"></div>
+      </div>
+     
+    </div>
+      
+  <script id="jsbin-javascript">
+
+//My JSON
+var cities = [{
+ 		"name": "Hudson Bay",
+ 		"lat": "60",
+ 		"long": "-85",
+ 		"iconColor": "42f44b",
+ 		"popupText": "This is Hudson Bay"
+ 	},
+ 	{
+ 		"name": "Death Valley",
+ 		"lat": "36.246944",
+ 		"long": "-116.816944",
+ 		"iconColor": "a339a1",
+ 		"popupText": "This is Death Valley"
+ 	}
+ ];
+
+
+//My GeoJson
+var myGeoJSON = {"type":"FeatureCollection","features":[{"type":"Feature","properties":{"marker-color":"#2dc0d0","marker-size":"medium","marker-symbol":"","title":"Angel Falls"},"geometry":{"type":"Point","coordinates":[-62.46826171874999,5.714379819235291]}},{"type":"Feature","properties":{"stroke":"#2600aa","stroke-width":4,"stroke-opacity":1,"title":"Amazon River"},"geometry":{"type":"LineString","coordinates":[[-66.97265625,-2.460181181020993],[-65.7421875,-2.460181181020993],[-64.3359375,-4.039617826768424],[-63.54492187500001,-4.302591077119676],[-60.029296875,-3.2502085616531686],[-58.18359375,-3.2502085616531686],[-57.30468749999999,-2.460181181020993],[-56.07421875,-2.460181181020993],[-54.66796875,-2.460181181020993],[-52.734375,-1.0546279422758742],[-51.328125,-1.0546279422758742],[-49.21875,0.3515602939922709]]}},{"type":"Feature","properties":{"marker-color":"#804040","marker-size":"medium","marker-symbol":"triangle-stroked","title":"Aconcagua (Highest Peak)"},"geometry":{"type":"Point","coordinates":[-70.13671875,-33.137551192346145]}},{"type":"Feature","properties":{"stroke":"#fd0b0b","stroke-width":5,"stroke-opacity":1,"title":"Strait of Magellan"},"geometry":{"type":"LineString","coordinates":[[-68.31298828125,-52.52290594027806],[-69.32373046875,-52.3755991766591],[-69.67529296875,-52.50953477032728],[-69.873046875,-52.6030475337285],[-70.51025390625,-52.97510818173529],[-70.83984375,-53.59250480903936],[-70.90576171875,-53.83956367883359],[-71.60888671875,-53.91728101547621],[-72.44384765625,-53.63161060657857],[-73.47656249999999,-53.054421865461016],[-74.267578125,-52.709675332198834]]}}]};
+
+//My Base Layers
+var OpenTopoMap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+	maxZoom: 17,
+	attribution: 'Map data: &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+});
+
+var Esri_WorldPhysical = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Source: US National Park Service',
+	maxZoom: 8
+});
+
+var NASAGIBS_ViirsEarthAtNight2012 = L.tileLayer('https://map1.vis.earthdata.nasa.gov/wmts-webmerc/VIIRS_CityLights_2012/default/{time}/{tilematrixset}{maxZoom}/{z}/{y}/{x}.{format}', {
+	attribution: 'Imagery provided by services from the Global Imagery Browse Services (GIBS), operated by the NASA/GSFC/Earth Science Data and Information System (<a href="https://earthdata.nasa.gov">ESDIS</a>) with funding provided by NASA/HQ.',
+	bounds: [[-85.0511287776, -179.999999975], [85.0511287776, 179.999999975]],
+	minZoom: 1,
+	maxZoom: 8,
+	format: 'jpg',
+	time: '',
+	tilematrixset: 'GoogleMapsCompatible_Level'
+});
+
+
+//My Overlay Layers
+
+var Stamen_TonerLines = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lines/{z}/{x}/{y}.{ext}', {
+	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+	subdomains: 'abcd',
+	minZoom: 0,
+	maxZoom: 20,
+	ext: 'png'
+});
+
+var Stamen_TonerLabels = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-labels/{z}/{x}/{y}.{ext}', {
+	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+	subdomains: 'abcd',
+	minZoom: 0,
+	maxZoom: 20,
+	ext: 'png'
+});
+
+//My Layer Group in Africa
+var africa1= L.marker([0,0]).bindPopup("This is 0 Lat and 0 Long!"),
+    africa2 = L.marker([20.2,21.8]).bindPopup("This is the Sahara Desert"),
+      africa3 = L.marker([-33.6,18.8]).bindPopup("This is Cape Town"),
+    africa4 = L.marker([-17.7,45.8]).bindPopup("This is Madagascar");
+
+var africaPoints = L.layerGroup([africa1, africa2, africa3, africa4]);
+
+
+//creating my map
+var map = L.map('map', {
+  center: new L.LatLng(29.0,-17.2),
+  zoom: 1,
+  layers: [OpenTopoMap]
+});
+
+
+//My Layer Control
+var baseMaps = {
+  "Topo Map": OpenTopoMap,
+  "ESRI  World Physical": Esri_WorldPhysical,
+  "The Night Sky": NASAGIBS_ViirsEarthAtNight2012
+};
+
+var overlayMaps = {
+  "Lines": Stamen_TonerLines,
+  "Africa Points": africaPoints,
+  "Labels":Stamen_TonerLabels
+};
+
+L.control.layers(baseMaps, overlayMaps).addTo(map);
+
+
+
+  
+//Adding My JSON
+var iconMarkerURL = "http://www.googlemapsmarkers.com/v1/";
+
+for (var i = 0; i<cities.length; i++) {
+  var marker = L.marker([cities[i].lat, cities[i].long],{
+    icon: L.icon({
+      iconUrl:iconMarkerURL + cities[i].iconColor,
+      iconSize:[39,27],
+      iconAnchor:[5,17],
+      popupAnchor:[0,-20]
+    }),
+    title:cities[i].name
+  }).bindPopup(cities[i].name+cities[i].popupText).addTo(map);
+}
+
+//Adding my GeoJSON
+L.geoJSON(myGeoJSON,{
+}).addTo(map);
+
+
+//Markers
+var custom = L.icon({
+    iconUrl: 'http://icons.iconarchive.com/icons/icons-land/vista-map-markers/256/Map-Marker-Marker-Outside-Pink-icon.png',
+    iconSize: [55, 65],
+    iconAnchor: [22, 64],
+    popupAnchor: [9, -76],
+    });
+L.marker([27.988056,86.925278], {
+  icon: custom,
+  draggable:false,
+  title: "Mt. Everest"
+}).addTo(map);
+
+var nKorea = 
+L.marker([39,126], {
+  title: "Scary North Korea"
+}).addTo(map);
+
+//Polygon
+var latlngs = [[8.6,77.7],[16.2, 79.6],[23.8, 87.8],[31, 76.2], [23.2,70.5]];
+var polygon = L.polygon(latlngs, {color: 'red'    
+ }).addTo(map);
+
+
+
+
+//button controls
+
+//North America
+$("northAmerica").click(function(){
+  map.setView(new L.LatLng(40,-95),4);
+});
+
+//South America
+$("southAmerica").click(function(){
+  map.setView(new L.LatLng(-15,-58),4);
+});
+
+//Africa
+$("africa").click(function(){
+  map.setView(new L.LatLng(8,22),4);
+});
+
+//Asia
+$("asia").click(function(){
+  map.setView(new L.LatLng(48,99),3);
+});
+
+//Asia
+$("world").click(function(){
+  map.setView(new L.LatLng(0,0),1);
+});
+</script>
+</body>
+</html>
