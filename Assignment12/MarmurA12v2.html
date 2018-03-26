@@ -9,9 +9,11 @@ Released under the MIT license: http://jsbin.mit-license.org
 -->
 <meta name="robots" content="noindex">
 <html>
-<script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/CC138D45-6C3B-474D-AE09-BA5EEBECB560/main.js" charset="UTF-8"></script><link rel="stylesheet" crossorigin="anonymous" href="https://gc.kis.v2.scr.kaspersky-labs.com/065BCEBEE5AB-90EA-D474-B3C6-54D831CC/abn/main.css"/><script src="https://code.jquery.com/jquery-3.1.0.js"></script>
 
   <head>
+	  
+	  <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/CC138D45-6C3B-474D-AE09-BA5EEBECB560/main.js" charset="UTF-8"></script><link rel="stylesheet" crossorigin="anonymous" href="https://gc.kis.v2.scr.kaspersky-labs.com/065BCEBEE5AB-90EA-D474-B3C6-54D831CC/abn/main.css"/><script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+
 <meta name="description" content="MarmurA12v2">
       
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" />
@@ -239,29 +241,27 @@ var polygon = L.polygon(latlngs, {color: 'red'
 //button controls
 
 //North America
-$("northAmerica").click(function(){
-  map.setView(new L.LatLng(40,-95),4);
+$("#northAmerica").click(function(){
+  map.setView(new L.LatLng(40.0,-95.0),3);
 });
 
 //South America
-$("southAmerica").click(function(){
-  map.setView(new L.LatLng(-15,-58),4);
+$("#southAmerica").click(function(){
+  map.setView(new L.LatLng(-29,-58),3);
 });
 
 //Africa
-$("africa").click(function(){
-  map.setView(new L.LatLng(8,22),4);
+$("#africa").click(function(){
+  map.setView(new L.LatLng(0,20),3);
 });
 
 //Asia
-$("asia").click(function(){
-  map.setView(new L.LatLng(48,99),3);
+$("#asia").click(function(){
+  map.setView(new L.LatLng(48,99),2);
 });
 
-//Asia
-$("world").click(function(){
+//World
+$("#world").click(function(){
   map.setView(new L.LatLng(0,0),1);
 });
-</script>
-</body>
-</html>
+
