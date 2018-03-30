@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<!--
+Created using JS Bin
+http://jsbin.com
+
+Copyright (c) 2018 by bmarmur (http://jsbin.com/mogelac/48/edit)
+
+Released under the MIT license: http://jsbin.mit-license.org
+-->
+<meta name="robots" content="noindex">
+<html>
+
+<head>
+<meta name="description" content="MarmurA13v2">
+  
+
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" />
+  
+  <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js">
+  </script>
+  
+    	<script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+  
+  <script src = "https://bmarmur.github.io/LA558/data/IowaCitiesJSON.js">
+  </script>
+  
+
+  <script src ="https://profseeger.github.io/LA558/data/CyStatues/cy_statues.json">
+  </script>	
+
+<style id="jsbin-css">
+#map1, #map2, #map3 {
+     width: 500px;
+     height:500px;
+     background-color: thistle;
+}
+
+
+.legend {
+    line-height: 18px;
+    color: #555;
+}
+.legend i {
+    width: 49px;
+    height: 25px;
+    float: left;
+    margin-right: 8px;
+    opacity: 0.9;
+}
+.info {
+    padding: 6px 8px;
+    font: 15px/25px Arial, Helvetica, sans-serif;
+    background: rgba(255,255,255,0.8);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+}
+.info h4 {
+    margin: 0 0 5px;
+    color: #777;
+}
+
+</style>
+</head>
+<body>
+  
+   <p>Map loads external JSON data (stored in my Github)</p>
+<div id='map1'></div>
+  <br>
+ 
+  <p>Map loads external GeoGson data (stored in Prof. Seeger's GitHub)</p>
+  <div id='map2'></div>
+  <br>
+  <p>Map contains thematic map with legend</p>
+  <div id='map3'></div>
+  
+  
+<script id="jsbin-javascript">
+
+//Loading External JSON with JQuery
+var map = L.map('map1').setView([42.2, -93.8], 6);
+
+L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+$.each(JSON.parse(iowaCities), function (idx, obj) {
+  var marker = L.marker([obj.latitude, obj.longitude], {
+    title: obj.title,
+    opacity: 0.9,
+    riseOnHover: true
+  }).addTo(map);
+  marker.bindPopup(obj.description);
+});
+
+
+
+
+
+
+
+// ***********************************************
+//************************************************
+
+
+
+//Loading external GeoJSON
+var map = L.map('map2').setView([42.02, -93.65], 12);
+
+L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+L.geoJson(cyStatues, {
+  
+  pointToLayer: function(feature, latlng) {
+    return new L.CircleMarker (latlng, {
+      stroke: true,
+      weight: 2,
+      color: '#f4e842',
+      opacity: 1.0,
+      fillColor: '#bf0000', fillOpacity: 0.9,
+      radius: 10,
+    });
+  },
+ 
+   onEachFeature: function (feature, layer) {
+        htmlText = "<strong>" + feature.properties.name + "</strong><br><img src='http://129.186.142.145/teachingGIS/webgis/cyStatues/" + feature.properties.photos + ".jpg' alt='Smiley face' height='266' width='200'>";
+        layer.bindPopup(htmlText);
+ layer.bindTooltip(feature.properties.name);
+}
+}).addTo(map);
+
+
+
+//********************************************
+//***************************************
+
+
+
+
+//Thematic map with legend
+var map = L.map('map3').setView([42.02, -93.65], 4);
+
+L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+var themePoints = [
+  ["10", 42.0, -93.0, "point1"],
+  ["17", 40.0, -93.0, "point2"],
+  ["13", 44.0, -93.0, "point3"],
+  ["9", 42.0, -91.0, "point4"],
+  ["15", 42.0, -96.0, "point5"],
+  ["11", 42.0, -99.0, "point6"],
+  ];
+
+function getColor(d) {
+  return d == 'point1' ? "#edf8fb" :
+  d == 'point2' ? "#b3cde3" :
+  d == 'point3' ? "#9ebcda" :
+  d == 'point4' ? "#8c96c6" :
+  d == 'point5' ? "#8856a7" :
+  d == 'point6' ? "#810f7c" :
+  "#FFFFFF";
+ }
+
+for (var i = 0; i < themePoints.length; i++) {
+  marker = new L.circleMarker ([themePoints[i][1], themePoints[i][2]], {
+    radius: themePoints[i][0],
+    fillColor:getColor(themePoints[i][3]),
+    color:"#000",
+    weight:0.0 ,
+    opacity: 1,
+    fillOpacity: 0.9
+  })
+  .bindPopup("Category: " + themePoints[i][3])
+  .addTo(map);
+}
+
+
+var legend = L.control({
+  position:'topright'
+});
+
+legend.onAdd = function(map){
+  
+  var div = L.DomUtil.create('div', 'info legend'),
+      pointsX = ['point1', 'point2', 'point3', 'point4', 'point5', 'point6'],
+      labels = [''];
+  
+for (var i = 0; i < pointsX.length; i++) {
+        div.innerHTML +=
+      '<i style="background:' + getColor(pointsX[i]) + ' "></i> ' +
+      pointsX[i] + (pointsX ? '' + '<br>' : '');
+  }
+
+  return div;
+};
+
+legend.addTo(map);
+
+//***************************************
+//***************************************
+
+</script>
+</body>
+</html>
