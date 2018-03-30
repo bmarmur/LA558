@@ -135,6 +135,19 @@ for (var i=0; i< myPoints.length;i++) {
   
 }
 
+	//DivMarker
+var myDivIcon1 = L.divIcon({
+  
+});
+var markerX = L.marker ([42.0, -93.50],{
+  icon: myDivIcon1,
+}).addTo(map).bindPopup("I am markerX");
+var myDivIcon1 = L.divIcon({
+ iconSize: new L.Point(50, 50),
+ iconAnchor: new L.Point(20, 20),
+ html: 'test',
+ className: 'leaflet-div-icon'
+});
 
 </script>
 </body>
