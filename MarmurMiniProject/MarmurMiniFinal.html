@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<!--
+Created using JS Bin
+http://jsbin.com
+
+Copyright (c) 2018 by bmarmur (http://jsbin.com/soxocap/8/edit)
+
+Released under the MIT license: http://jsbin.mit-license.org
+-->
+<meta name="robots" content="noindex">
+<html>
+<head>
+<meta name="description" content="Marmurminitest2">
+  
+  
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" />
+  
+  <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/CC138D45-6C3B-474D-AE09-BA5EEBECB560/main.js" charset="UTF-8"></script><link rel="stylesheet" crossorigin="anonymous" href="https://gc.kis.v2.scr.kaspersky-labs.com/065BCEBEE5AB-90EA-D474-B3C6-54D831CC/abn/main.css"/><script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js">
+  </script>
+  
+<script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+	
+   <script
+           src="https://bmarmur.github.io/LA558/data/treeData2.js"></script>
+  
+<style id="jsbin-css">
+body {
+  background-color: lightgrey;
+}
+
+#container {
+background: thistle;
+width: 800px;
+  height: 900px;
+padding: 10px;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#header {
+  background: #edf3ff;
+  margin-left: 50px;
+  margin-right: 50px;
+  text-align: center;
+}
+
+#content {
+  width: 780px;
+  height: 20px;
+  padding: 10px;
+  background-color:white;
+  }
+
+#map {
+     width: 650px;
+     height: 500px;
+     background-color: thistle;
+      margin-left: auto;
+  margin-right: auto;
+}
+
+.legend {
+    line-height: 10px;
+    color: #555;
+}
+.legend i {
+    width: 18px;
+    height: 20px;
+    float: left;
+    margin-right: 8px;
+    opacity: 0.9;
+}
+.info {
+    padding: 6px 8px;
+    font: 10px/20px Arial, Helvetica, sans-serif;
+    background: rgba(255,255,255,0.8);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+}
+.info h4 {
+    margin: 0 0 5px;
+    color: #777;
+}
+
+
+</style>
+</head>
+<body>
+  <div id="container">
+      <div id="header">
+  
+        <h3> Explore the Trees in a Des Moines Neighborhood! </h3>
+      </div>
+   <div id="content">
+      <input type="checkbox" id="hackberryCheck" value="hackberry"> Hackberry
+    	<input type="checkbox" id="sycamoreCheck" value="sycamore"> Sycamore
+      <input type="checkbox" id="blackWalnutCheck" value="blackWalnut"> Black Walnut
+      <input type="checkbox" id="treeOfHeavenCheck" value="treeOfHeaven"> Tree Of Heaven
+      <input type="checkbox" id="siberianElmCheck" value="siberianElm"> Siberian Elm
+      <input type="checkbox" id="silverMapleCheck" value="silverMaple"> Silver Maple<br><br>
+  
+    <div id='map'></div>
+     
+     <div id="projectDescription">
+       <p>
+         
+         For my mini project I created a web page that shows some of data from a research project I collaborate on. This is in the Capitol East Neighborhood in Des Moines. We have conducted a complete tree inventory for a portion of the neighborhood. For this project, I created a map that shows the location of 6 different tree species. The data comes from an external geoJson file and can be toggled on an off with the checkboxes. Each species has a unique color that is indicated with a legend, and a layer control allows different basemaps to be selected if the viewer wants to compare tree location to actual aerial photographs or building locations. Each tree, when clicked, displays a popup that provides the trees canopy dimensions. <br><br>
+
+I hope to expand this page into my final project by adding information about the tree species that will appear with events (on radio buttons or something similar). I would also like to add a feature where the user can add data points, complete with tree property entry, to foster citizen science. I would also really like to find a way to have the user flag certain existing trees in the data set, say they know of one that had died and wanted to notify us.
+     
+       </p>
+     </div>
+
+    
+    </div>
+  </div>  
+<script id="jsbin-javascript">
+
+//Creating base layers
+var OpenStreetMap_Mapnik = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	maxZoom: 19,
+	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+});
+
+
+var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+});
+
+var Esri_WorldTopoMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
+});
+
+//*************************************************
+
+//set color by species
+function getColor(d){
+  return d == 'Sycamore' ? '#0145b2':
+  d == 'Black Walnut' ? '#009b26':
+  d == 'Hackberry' ? '#f97000':
+  
+  d == 'Siberian Elm' ? '#7004ce':
+  d == 'Silver Maple' ? '#000000':
+  d == 'Tree of Heaven' ? '#ffffff':
+  "#42dcf4";
+}
+
+var map = L.map('map',{
+    center:[41.5938, -93.5895],
+      zoom: 17,
+   layers: [OpenStreetMap_Mapnik]
+});
+
+/*
+function addMarker(e){
+// Add marker to map at click location; add popup window
+var newMarker = new L.marker(e.latlng).addTo(map);
+}
+*/
+
+function addPopups(feature, layer) {
+  layer.bindPopup("<strong>" + 'Canopy Dimensions: ' + feature.properties.CanAvDim + " ft" + "</strong>"
+   );
+}
+
+
+var geojsonMarkerOptions = {
+  radius: 8,
+  fillColor: "black", //overridden by category
+  color: "#000",
+  weight: 1,
+  opacity: 1,
+  fillOpacity: 0.9
+};
+
+
+//load filtered geojson into variable
+var hackberryMarkers = L.geoJson(treeData, {
+  onEachFeature: addPopups,
+  filter: function(feature, layer) {
+    if (feature.properties.Species == 'Hackberry') {
+      return true;
+    }
+  },
+  pointToLayer: function(feature, latlng) {
+    return L.circleMarker(latlng, geojsonMarkerOptions);
+  },
+  style: function(feature) {
+    return {
+      fillColor: getColor(feature.properties.Species),
+    };
+  }
+});
+
+
+var sycamoreMarkers = L.geoJson(treeData, {
+  onEachFeature: addPopups,
+  filter: function(feature, layer) {
+    if (feature.properties.Species == 'Sycamore') {
+      return true;
+    }
+  },
+  pointToLayer: function(feature, latlng) {
+    return L.circleMarker(latlng, geojsonMarkerOptions);
+  },
+  style: function(feature) {
+    return {
+      fillColor: getColor(feature.properties.Species),
+    };
+  }
+});
+
+var treeOfHeavenMarkers = L.geoJson(treeData, {
+  onEachFeature: addPopups,
+  filter: function(feature, layer) {
+    if (feature.properties.Species == 'Tree of Heaven') {
+      return true;
+    }
+  },
+  pointToLayer: function(feature, latlng) {
+    return L.circleMarker(latlng, geojsonMarkerOptions);
+  },
+  style: function(feature) {
+    return {
+      fillColor: getColor(feature.properties.Species),
+    };
+  }
+});
+
+var blackWalnutMarkers = L.geoJson(treeData, {
+  onEachFeature: addPopups,
+  filter: function(feature, layer) {
+    if (feature.properties.Species == 'Black Walnut') {
+      return true;
+    }
+  },
+  pointToLayer: function(feature, latlng) {
+    return L.circleMarker(latlng, geojsonMarkerOptions);
+  },
+  style: function(feature) {
+    return {
+      fillColor: getColor(feature.properties.Species),
+    };
+  }
+});
+
+var siberianElmMarkers = L.geoJson(treeData, {
+  onEachFeature: addPopups,
+  filter: function(feature, layer) {
+    if (feature.properties.Species == 'Siberian Elm') {
+      return true;
+    }
+  },
+  pointToLayer: function(feature, latlng) {
+    return L.circleMarker(latlng, geojsonMarkerOptions);
+  },
+  style: function(feature) {
+    return {
+      fillColor: getColor(feature.properties.Species),
+    };
+  }
+});
+
+var silverMapleMarkers = L.geoJson(treeData, {
+  onEachFeature: addPopups,
+  filter: function(feature, layer) {
+    if (feature.properties.Species == 'Silver Maple') {
+      return true;
+    }
+  },
+  pointToLayer: function(feature, latlng) {
+    return L.circleMarker(latlng, geojsonMarkerOptions);
+  },
+  style: function(feature) {
+    return {
+      fillColor: getColor(feature.properties.Species),
+    };
+  }
+});
+
+
+//Listen for check box change
+$("#hackberryCheck").change(function() {
+  if ($(this).is(":checked")) {
+    hackberryMarkers.addTo(map);
+  } else {
+    hackberryMarkers.remove(map);
+  }
+});
+
+
+$("#sycamoreCheck").change(function() {
+  if ($(this).is(":checked")) {
+    sycamoreMarkers.addTo(map);
+  } else {
+    sycamoreMarkers.remove(map);
+  }
+});
+
+$("#treeOfHeavenCheck").change(function() {
+  if ($(this).is(":checked")) {
+    treeOfHeavenMarkers.addTo(map);
+  } else {
+    treeOfHeavenMarkers.remove(map);
+  }
+});
+
+$("#blackWalnutCheck").change(function() {
+  if ($(this).is(":checked")) {
+    blackWalnutMarkers.addTo(map);
+  } else {
+    blackWalnutMarkers.remove(map);
+  }
+});
+
+$("#siberianElmCheck").change(function() {
+  if ($(this).is(":checked")) {
+    siberianElmMarkers.addTo(map);
+  } else {
+    siberianElmMarkers.remove(map);
+  }
+});
+
+$("#silverMapleCheck").change(function() {
+  if ($(this).is(":checked")) {
+    silverMapleMarkers.addTo(map);
+  } else {
+    silverMapleMarkers.remove(map);
+  }
+});
+
+
+//****************************************************
+ 
+
+
+
+
+
+//legend
+var legend =L.control({position: 'bottomright'});
+
+legend.onAdd=function(map) {
+    var div = L.DomUtil.create('div', 'info legend'),
+     treeType = ["Sycamore", "Black Walnut", "Hackberry", "Siberian Elm", "Silver Maple", "Tree of Heaven", ],
+     labels = ["Sycamore", "Black Walnut", "Hackberry", "Siberian Elm", "Silver Maple", "Tree of Heaven",];
+  
+  //not sure what line 63 does? 
+  	div.innerHTML += "<b>treeType</b><br>";
+  // loop through items and generate a label with a colored square for each
+  for (var i = 0; i < treeType.length; i++) {
+    div.innerHTML +=
+      '<i style="background:' + 
+      getColor(treeType[i]) + ' "></i> ' +
+      labels[i] + (treeType ? ' '+'<br>' :'');
+                     } 
+                     return div;
+                     };
+legend.addTo(map);
+
+
+//Layer Control
+var baseMaps = {
+  "Open Street Map": OpenStreetMap_Mapnik,
+  "Imagery": Esri_WorldImagery,
+  "Topo": Esri_WorldTopoMap
+};
+
+
+L.control.layers(baseMaps).addTo(map);
+
+
+</script>
+</body>
+</html>
