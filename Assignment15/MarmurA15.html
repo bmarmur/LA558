@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<!--
+Created using JS Bin
+http://jsbin.com
+
+Copyright (c) 2018 by bmarmur (http://jsbin.com/hevoruf/7/edit)
+
+Released under the MIT license: http://jsbin.mit-license.org
+-->
+<meta name="robots" content="noindex">
+<html>
+<head>
+<meta name="description" content="MarmurA15">
+ 
+   <meta name="description" content="LA 458/558 19a Leaflet patterns" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />
+
+    <script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet.js"></script>
+	  
+    <script src="https://bmarmur.github.io/LA558/data/storyCountyZips.json" type="text/javascript"></script>
+	  
+	  <script src="https://bmarmur.github.io/LA558/Classes/patterns/leaflet.pattern.js"></script> 
+  
+  	  <script src="https://bmarmur.github.io/LA558/Assignment15/a15Points.json"></script> 
+	  
+	  <script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+  
+   <script src="https://bmarmur.github.io/LA558/Classes/awesomeMarkers/leaflet.awesome-markers.js"></script>
+
+  <link rel="stylesheet" href="https://bmarmur.github.io/LA558/Classes/awesomeMarkers/leaflet.awesome-markers.css">
+
+
+  
+  <!--From Seegar JSBIN Example-->
+  	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	
+	<link rel="stylesheet" href="http://code.ionicframework.com/ionicons/1.5.2/css/ionicons.min.css">
+	
+   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+  <style id="jsbin-css">
+html, body { margin: 0; padding: 0; }
+body {background-color: thistle;}
+
+
+
+#map{ width: 500px; height: 400px; margin: 0; padding: 0; }
+</style>
+</head>
+
+  <body>
+    <div id="map"></div>
+
+<br>
+    <input type="checkbox" id="number1" value="1"> Click to turn on Points Number 1<br>
+    	<input type="checkbox" id="number2" value="2"> Click to turn on Points Number 2<br>
+      <input type="checkbox" id="number3" value="3"> Click to turn on Points Number 3<br>
+      <input type="checkbox" id="number4" value="4">  Click to turn on Points Number 4<br>
+      <input type="checkbox" id="number5" value="5"> Click to turn on Points Number 5
+          <br>
+  
+  <script id="jsbin-javascript">
+
+//Base layers and overlays
+var OSM = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+	attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+	maxZoom: 18
+});
+
+
+var ortho_1930 = L.tileLayer.wms("http://ortho.gis.iastate.edu/arcgis/services/ortho/ortho_1930/ImageServer/WMSServer", {
+	layers: 'ortho_1930',
+	format: 'image/png',
+	transparent: true,
+	attribution: "Iowa State University GIS Facility &copy; 2016, Iowa DNR"
+});
+
+var naip_2013_nc = L.tileLayer.wms("http://ortho.gis.iastate.edu/arcgis/services/ortho/naip_2013_nc/ImageServer/WMSServer", {
+	layers: 'naip_2013_nc',
+	format: 'image/png',
+	transparent: true,
+	attribution: "Iowa State University GIS Facility &copy; 2016, USDA NAIP 2013"
+});
+
+
+//create the maps
+var map = L.map('map', {
+	center: new L.LatLng(42.0, -93.9908),
+	zoom: 8,
+	layers: [OSM]
+});
+
+
+
+var bigStripe3 = new L.StripePattern({
+	weight: 2,
+  color: 'green',
+	spaceWeight: 5,
+	angle: 0,
+	opacity: 1,
+	spaceOpacity: 0.5,
+});
+bigStripe3.addTo(map);
+
+var bigStripe2 = new L.StripePattern({
+	weight: 2,
+  color: 'red',
+	spaceWeight: 5,
+	angle: 45,
+	opacity: 1,
+	spaceOpacity: 0.5,
+});
+bigStripe2.addTo(map);
+
+var bigStripe1 = new L.StripePattern({
+	color: 'orange',
+  weight: 2,
+	spaceWeight: 5,
+	angle: 90,
+	opacity: 1,
+	spaceOpacity: 0.5,
+});
+bigStripe1.addTo(map);
+
+
+var bigStripe0 = new L.StripePattern({
+	opacity: 0.0,
+});
+
+bigStripe0.addTo(map);
+
+
+function getPattern(d) {
+	return d == "good" ? bigStripe3:	
+	d == "fair" ? bigStripe2:
+	d == "poor" ? bigStripe1:
+	bigStripe0;
+}
+
+
+function percentHatch(feature) {
+	return{
+	//	fillColor: "Green",
+		//fillPattern: bigStripe1,
+	fillPattern: getPattern(feature.properties.condition),
+		weight: 1,
+		opacity: 1,
+		color: 'black',
+		fillOpacity: 0.50
+	};
+}
+
+
+
+var zipCodes = L.geoJson(zips, {
+	style: percentHatch,
+    onEachFeature: function (feature, layer) {
+    popUpText = "Zip Code: "+feature.properties.ZIP+"<br> Condition: "+feature.properties.condition;
+        return layer.bindPopup(popUpText, {
+            closeButton: true
+        });
+    }
+}).addTo(map);
+
+
+//set color by number
+function getColor(d){
+  return d == '1' ? 'red':
+  d == '2' ? 'yellow':
+  d == '3' ? 'green':
+  d == '4' ? 'blue':
+  d == '5' ? 'purple':
+  '#ffffff';
+}
+
+function addPopups(feature, layer) {
+  layer.bindPopup("Number: " + feature.properties.number);
+}
+
+var geojsonMarkerOptions = {
+  radius: 5,
+  fillColor: "#000000",
+  color: "fff",
+  weight:1,
+  opacity: 1,
+  fillOpacity: 0.9
+};
+
+var points1 = L.geoJson(randomPoints, {
+  onEachFeature: addPopups,
+  filter: function (feature, layer) {
+    if (feature.properties.number == "1"){
+      return true;
+    }
+  },
+  pointToLayer: function (feature, latlng) {
+    return L.circleMarker(latlng, geojsonMarkerOptions);
+  },
+  style: function (feature) {
+    return{
+      fillColor: getColor(feature.properties.number),
+    };
+  }
+ });
+//.addTo(map);
+
+var points2 = L.geoJson(randomPoints, {
+  onEachFeature: addPopups,
+  filter: function (feature, layer) {
+    if (feature.properties.number == "2"){
+      return true;
+    }
+  },
+  pointToLayer: function (feature, latlng) {
+    return L.circleMarker(latlng, geojsonMarkerOptions);
+  },
+  style: function (feature) {
+    return{
+      fillColor: getColor(feature.properties.number),
+    };
+  }
+ });
+//.addTo(map);
+
+var points3 = L.geoJson(randomPoints, {
+  onEachFeature: addPopups,
+  filter: function (feature, layer) {
+    if (feature.properties.number == "3"){
+      return true;
+    }
+  },
+  pointToLayer: function (feature, latlng) {
+    return L.circleMarker(latlng, geojsonMarkerOptions);
+  },
+  style: function (feature) {
+    return{
+      fillColor: getColor(feature.properties.number),
+    };
+  }
+ });
+//.addTo(map);
+
+var points4 = L.geoJson(randomPoints, {
+  onEachFeature: addPopups,
+  filter: function (feature, layer) {
+    if (feature.properties.number == "4"){
+      return true;
+    }
+  },
+  pointToLayer: function (feature, latlng) {
+    return L.circleMarker(latlng, geojsonMarkerOptions);
+  },
+  style: function (feature) {
+    return{
+      fillColor: getColor(feature.properties.number),
+    };
+  }
+ });
+//.addTo(map);
+
+var points5 = L.geoJson(randomPoints, {
+  onEachFeature: addPopups,
+  filter: function (feature, layer) {
+    if (feature.properties.number == "5"){
+      return true;
+    }
+  },
+  pointToLayer: function (feature, latlng) {
+    return L.circleMarker(latlng, geojsonMarkerOptions);
+  },
+  style: function (feature) {
+    return{
+      fillColor: getColor(feature.properties.number),
+    };
+  }
+ });
+//.addTo(map);
+
+
+var marker1 = L.marker([42.15933,-94.9099], {
+    icon: L.AwesomeMarkers.icon({
+  icon: 'flag',
+    prefix: 'fa',
+      markerColor: 'green',
+        iconColor: 'red',
+          spin: true
+})
+});
+
+var marker2 = L.marker([42.0870, -95.01275], {
+    icon: L.AwesomeMarkers.icon({
+  icon: 'star',
+    prefix: 'glyphicon',
+      markerColor: 'green',
+        iconColor: 'blue',
+         })
+});
+
+var marker3 = L.marker([41.95642, -94.91275], {
+    icon: L.AwesomeMarkers.icon({
+  icon: 'coffee',
+    prefix: 'fa',
+      markerColor: 'darkblue',
+        iconColor: 'gray',
+         })
+});
+
+var allMarkers = new L.featureGroup([marker1, marker2, marker3]);
+allMarkers.addTo(map);
+
+
+//Listen for check box change
+$("#number1").change(function() {
+  if ($(this).is(":checked")) {
+    points1.addTo(map);
+  } else {
+    points1.remove(map);
+  }
+});
+
+
+$("#number2").change(function() {
+  if ($(this).is(":checked")) {
+    points2.addTo(map);
+  } else {
+    points2.remove(map);
+  }
+});
+
+$("#number3").change(function() {
+  if ($(this).is(":checked")) {
+    points3.addTo(map);
+  } else {
+    points3.remove(map);
+  }
+});
+
+$("#number4").change(function() {
+  if ($(this).is(":checked")) {
+    points4.addTo(map);
+  } else {
+    points4.remove(map);
+  }
+});
+
+$("#number5").change(function() {
+  if ($(this).is(":checked")) {
+    points5.addTo(map);
+  } else {
+    points5.remove(map);
+  }
+});
+
+
+var allPoints = L.layerGroup([points1, points2, points3, points4, points5]);
+
+//layer control
+var baseMaps = {
+	"OpenStreetMap": OSM,
+	"1930 Aerial": ortho_1930,
+	"2013 Aerial": naip_2013_nc
+};
+
+var overlayMaps = {
+	"Zip Codes": zipCodes,
+ "All Points": allPoints
+};
+
+L.control.layers(baseMaps, overlayMaps).addTo(map);
+
+/*
+//This code seems to only zoom the map to the awesome markers, ignoring the geoJSON data...
+map.fitBounds(allMarkers.getBounds(), {
+  padding: [100,100]
+});
+*/
+</script>
+</body>
+
+</html>
