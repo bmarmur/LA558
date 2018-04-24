@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<!--
+Created using JS Bin
+http://jsbin.com
+
+Copyright (c) 2018 by bmarmur (http://jsbin.com/xicuqid/2/edit)
+
+Released under the MIT license: http://jsbin.mit-license.org
+-->
+<meta name="robots" content="noindex">
+<html>
+<head>
+<meta name="description" content="MarmurA22">
+
+	
+  <title>LA 458/558 Turf JS Examples</title>
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" />
+	
+	<script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/CC138D45-6C3B-474D-AE09-BA5EEBECB560/main.js" charset="UTF-8"></script><link rel="stylesheet" crossorigin="anonymous" href="https://gc.kis.v2.scr.kaspersky-labs.com/065BCEBEE5AB-90EA-D474-B3C6-54D831CC/abn/main.css"/><script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"></script>
+	
+	
+<script src="https://code.jquery.com/jquery-2.0.3.js"></script>
+	
+<script src="https://npmcdn.com/@turf/turf@3.5.1/turf.min.js"></script>	
+	
+<script>
+    var bbox = turf.bbox(features);
+</script>
+	
+	
+	
+
+	
+</head>
+<body>
+			 
+		<div id="mapid" style="width: 600px; height: 400px;"></div>	 
+  
+  Change1: Changed the coordinates of the line to verify that the recalulation of line length worked. Initial line legth = 5.16 miles. New line length = 16.25 miles.
+  <br><br>
+  Change 2: Changed coordinates of polygon to verify polygon area calculation. Initial Area: 1.01 sq miles. New area: 4.9 sq miles. 
+  <br><br>
+  Change 3: implemented the suggested change to 42.05 from line 97
+  <br><br>
+  Change 4:  Changed numer in line 134 from 42.04 to 42.014. This changed the color of the cirlces, one from white to orange and vice versa. 
+  <br><br>
+  Change 5: Changed color of nearest marker from red to orange. 
+			 <br><hr><br>
+  Turf.js functions:
+  <br>
+  1) 'along' Takes a sting and returns a point a specificed distance along that line. So, for example, create a point 5 miles along a line 6 miles long. 
+  <br><br>
+  2) 'center' Retuns a point at the absolute center of a point or collection of points. 
+  <br><br>
+  3) 'centerOfMass' Returns a points at the center of mass of a point or collection or points or feature or featureCollection. 
+  <br><br>
+  4) 'great circle' Calculates a great circle between two points, returns it as a string. Example-the shortest actual distance between two points.
+  <br><br>
+  5) 'chunk'  Divides a line into chucks of lines of specified lengths. Maybe for deciding a route for a car trip or bike trip, breaking the total trip up into days by x miles per day. 
+
+<script id="jsbin-javascript">
+console.clear();
+//note that http://icons.webtoolhub.com/icon-p4s2023-set.aspx  used for the green icon source.
+
+//JSON of the line
+var myLine = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -93.4773,
+            41.89216
+          ],
+          [
+            -93.6634,
+            42.01269
+          ],
+          [
+            -93.6385,
+            41.989608
+          ],
+          [
+            -93.6289,
+            42.01052
+          ]
+        ]
+      }
+    }
+  ]
+};
+
+
+//JSON of the Polygon
+var myPolygon = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.658,
+              41.964851
+            ],
+            [
+              -93.56390,
+              41.964857
+            ],
+            [
+              -93.5639043,
+              41.979400
+            ],
+            [
+              -93.6586189,
+              41.9794004
+            ],
+            [
+              -93.658618,
+              41.964851
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+};
+
+
+
+//Calculate the length of the polyline in miles
+var length = turf.lineDistance(myLine, 'miles');
+console.log("myLine = "+ length + " miles");
+
+
+
+//calculates the area of the mPolygon in sq meters and sq miles
+var area = turf.area(myPolygon);
+	console.log(area + " sq meters");
+	console.log(area * 0.000000386102158542 + " sq miles");
+	
+
+//The green marker point on the map
+var myPoint = {
+  "type": "Feature",
+  "properties": {
+    "marker-color": "#0f0"
+  },
+  "geometry": {
+    "type": "Point",
+    "coordinates": [-93.6,42.05]  //change to 42.05 to cover blue marker and the closest white circle will change
+  }
+};
+
+
+//these are the three white circle markers
+var myPointCollection = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+		  id: 1
+	  },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-93.68,
+              41.98]
+      }
+    }, {
+      "type": "Feature",
+      "properties": {
+		  		  id: 2
+	  },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-93.57,
+              42.0145]
+      }
+    },{
+      "type": "Feature",
+      "properties": {
+		  		  id: 3
+	  },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-93.64,
+              42.014]
+      }
+    }
+  ]
+};
+
+
+
+
+//This calculation is geodesic distance of the white circle that is closest to the green marker.
+var nearest = turf.nearest(myPoint, myPointCollection);
+
+var nearestID = nearest.properties.id;
+
+console.log(nearest.properties.id);
+
+
+
+
+
+
+
+
+
+	
+
+
+//*****************
+var mapCenter = L.latLng(42.05,-93.6);
+
+	
+//var map = L.map('mapid').setView(mapCenter, 11);
+
+L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+		maxZoom: 18,
+		attribution: ''
+	}).addTo(map);
+
+var mapCenterMarker = L.marker(mapCenter).addTo(map);
+
+var myStyle = {
+    "color": "green",
+    "weight": 3,
+    "opacity": 0.65
+};
+
+
+var myPointIcon = L.icon({
+		iconUrl: 'https://profseeger.github.io/LA558/images/chartreuseMapMarker.png',
+		iconSize: [32, 32],
+		iconAnchor: [16, 32],
+		//popupAnchor: [0, -28]
+	});
+
+startPoint =  L.geoJSON(myPoint, {
+		pointToLayer: function (feature, latlng) {
+			return L.marker(latlng, {icon: myPointIcon});
+		},
+		//onEachFeature: onEachFeature
+	}).addTo(map);
+
+
+L.geoJSON(myLine, {
+    style: myStyle
+}).addTo(map);
+
+
+L.geoJSON(myPolygon, {
+    style: myStyle
+}).addTo(map);
+
+
+//if the ID of the item identified as being the nearest matches d, then change color of item to orange.
+function getColor(d) {
+    return d == nearestID ? 'red' :
+                'white';
+}
+
+var geojsonMarkerOptions = {
+    radius: 7,
+    //fillColor: "white",
+    color: "#000",
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.8
+};
+
+L.geoJSON(myPointCollection, {
+    pointToLayer: function (feature, latlng) {
+        return L.circleMarker(latlng, geojsonMarkerOptions);
+    },
+	style: function(feature) {
+	console.log(feature.properties.id);//note this is how you access contents of the id within L.geoJson
+		return {
+					//radius: some property from geojson,
+					fillColor: getColor(feature.properties.id)
+				};
+			},
+			onEachFeature: function (feature, layer) {
+				layer.bindPopup("ID: "+feature.properties.id);
+			}
+	
+}).addTo(map);
+
+</script>
+</body>
+</html>
